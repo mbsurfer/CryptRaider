@@ -18,6 +18,8 @@
 # files if adding them here.
 !/Content/**/*.uasset
 !/Content/**/*.umap
+
+# Ignore Asset Library
 /Content/MedievalDungeon
 
 # Allow any files from /RawContent dir.
