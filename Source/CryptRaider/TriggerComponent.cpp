@@ -13,9 +13,14 @@ UTriggerComponent::UTriggerComponent()
 	// ...
 }
 
-
 // Called when the game starts
 void UTriggerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+// Called every frame
+void UTriggerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
