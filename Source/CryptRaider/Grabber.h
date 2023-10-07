@@ -27,5 +27,9 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	float MaxGrabDistance = 200;
-		
+
+	UPROPERTY(EditAnywhere)
+	float GrabRadius = 100;
+
+	const ECollisionChannel GrabberChannel = ECC_GameTraceChannel2;
 };
