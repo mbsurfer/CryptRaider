@@ -44,4 +44,6 @@ private:
 	const ECollisionChannel GrabberChannel = ECC_GameTraceChannel2;
 
 	UPhysicsHandleComponent* GetPhysicsHandel() const;
+
+	bool GetGrabbableInReach(FHitResult& OutHitResult) const;
 };
