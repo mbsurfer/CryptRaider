@@ -38,12 +38,9 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	// UE_LOG(LogTemp, Display, TEXT("Time PLayed: %f"), ElapsedTime);
 
 	UPhysicsHandleComponent* PhysicsHandel = GetPhysicsHandel();
-	if (PhysicsHandel == nullptr) {
-		return;	
-	}
 
 	// Only update the target when grabbing
-	if (PhysicsHandel->GetGrabbedComponent() != nullptr) {
+	if (PhysicsHandel && PhysicsHandel->GetGrabbedComponent()) {
 		PhysicsHandel->SetTargetLocationAndRotation(
 			GetComponentLocation() + GetForwardVector() * HoldDistance, 
 			GetComponentRotation()
@@ -54,12 +51,9 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 void UGrabber::Grab()
 {
 	UPhysicsHandleComponent* PhysicsHandel = GetPhysicsHandel();
-	if (PhysicsHandel == nullptr) {
-		return;
-	}
-
 	FHitResult HitResult;
-	if (GetGrabbableInReach(HitResult)) {
+
+	if (PhysicsHandel && GetGrabbableInReach(HitResult)) {
 		// FString TargetName = HitResult.GetActor()->GetActorNameOrLabel();
 		// DrawDebugSphere(GetWorld(), HitResult.Location, 10, 10, FColor::Blue, false, 5);
 		// DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10, 10, FColor::Red, false, 5);
@@ -68,6 +62,9 @@ void UGrabber::Grab()
 		// Make sure physics is enabled on that target component
 		UPrimitiveComponent* HitComponent = HitResult.GetComponent();
 		HitComponent->WakeAllRigidBodies();
+
+		// Inform the hit target that it is being held
+		HitResult.GetActor()->Tags.Add("Grabbed");
 
 		PhysicsHandel->GrabComponentAtLocationWithRotation(
 			HitComponent, 
@@ -83,13 +80,8 @@ void UGrabber::Grab()
 void UGrabber::Release()
 {
 	UPhysicsHandleComponent* PhysicsHandel = GetPhysicsHandel();
-	if (PhysicsHandel == nullptr) {
-		return;
-	}
-	
-	UPrimitiveComponent* GrabbedComponent = PhysicsHandel->GetGrabbedComponent();
-	if (GrabbedComponent != nullptr) {
-		GrabbedComponent->WakeAllRigidBodies();
+	if (PhysicsHandel && PhysicsHandel->GetGrabbedComponent()) {
+		PhysicsHandel->GetGrabbedComponent()->GetOwner()->Tags.Remove("Grabbed");
 		PhysicsHandel->ReleaseComponent();
 	}
 }
@@ -98,7 +90,7 @@ UPhysicsHandleComponent* UGrabber::GetPhysicsHandel() const
 {
 	UPhysicsHandleComponent* PhysicsHandel = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 	
-	if (PhysicsHandel == nullptr) {
+	if (!PhysicsHandel) {
 		UE_LOG(LogTemp, Error, TEXT("Grabber is missing a UPhysicsHandleComponent!"));
 	}
 
