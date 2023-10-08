@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Grabbable.h"
 
 #include "Grabber.generated.h"
 
@@ -46,4 +47,8 @@ private:
 	UPhysicsHandleComponent* GetPhysicsHandel() const;
 
 	bool GetGrabbableInReach(FHitResult& OutHitResult) const;
+
+	UGrabbable* GetGrabbedComponent() const;
+
+	AActor* GrabbedActor;
 };

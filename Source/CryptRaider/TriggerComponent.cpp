@@ -2,6 +2,7 @@
 
 
 #include "TriggerComponent.h"
+#include "Grabbable.h"
 
 // Sets default values for this component's properties
 UTriggerComponent::UTriggerComponent()
@@ -47,8 +48,11 @@ AActor* UTriggerComponent::GetAcceptableActor() const
     TArray<AActor*> Actors;
     GetOverlappingActors(Actors);
     for (AActor* Actor : Actors) {
-        if (Actor->ActorHasTag(AcceptableActorTag) && !Actor->ActorHasTag("Grabbed")) {
-           return Actor;
+        if (Actor->ActorHasTag(AcceptableActorTag)) {
+            UGrabbable* GrabbableComponent = Actor->FindComponentByClass<UGrabbable>();
+            if (GrabbableComponent && !GrabbableComponent->GetIsGrabbed()) {
+                return Actor;
+            }
         }
     }
 

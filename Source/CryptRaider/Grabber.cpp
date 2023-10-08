@@ -64,12 +64,16 @@ void UGrabber::Grab()
 		HitComponent->WakeAllRigidBodies();
 		HitComponent->SetSimulatePhysics(true);
 
-		AActor* GrabbedActor = HitResult.GetActor();
-
-		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		GrabbedActor = HitResult.GetActor();
 
 		// Inform the hit target that it is being held
-		GrabbedActor->Tags.Add("Grabbed");
+		UGrabbable* GrabbableComponent = GetGrabbedComponent();
+		if(!GrabbableComponent) {
+			return;
+		}
+
+		GrabbedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		GrabbableComponent->SetIsGrabbed(true);
 
 		PhysicsHandel->GrabComponentAtLocationWithRotation(
 			HitComponent, 
@@ -86,9 +90,19 @@ void UGrabber::Release()
 {
 	UPhysicsHandleComponent* PhysicsHandel = GetPhysicsHandel();
 	if (PhysicsHandel && PhysicsHandel->GetGrabbedComponent()) {
-		PhysicsHandel->GetGrabbedComponent()->GetOwner()->Tags.Remove("Grabbed");
+		GetGrabbedComponent()->SetIsGrabbed(false);
 		PhysicsHandel->ReleaseComponent();
 	}
+}
+
+UGrabbable* UGrabber::GetGrabbedComponent() const
+{
+	UGrabbable* GrabbableComponent = GrabbedActor->FindComponentByClass<UGrabbable>();
+	if (!GrabbableComponent) {
+		UE_LOG(LogTemp, Error, TEXT("Actor is missing GrabbableComponent: %s"), *GrabbedActor->GetActorNameOrLabel());
+	}
+
+	return GrabbableComponent;
 }
 
 UPhysicsHandleComponent* UGrabber::GetPhysicsHandel() const
